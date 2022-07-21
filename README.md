@@ -58,3 +58,22 @@ The following are the possible events a frontend client can capture and post.
   "timeTaken": 72,
 }
 ```
+## Getting set up
+Setting this up is pretty straightforward and easy. You could compile and run in a single step by running the following
+from the base directory of this repo:
+
+```
+go run main.go
+``` 
+This is my personal first choice especially if this is being run in development and not deployed anywhere
+
+But if you'd rather build first then run the executable a simple :
+```
+go build main.go
+``` 
+will build and save the excutable in the same directory which would be `main` file on Linux OR MacOS and a
+`main.exe` file on Windows. which you can then run by typing `./main` on Linux and MacOS or by running thing `main.exe`
+file on windows.
+
+After successfully started, the server runs on http://localhost:8080/ and the struct construction is logged to console
+whenever there's a POST request matching an event.

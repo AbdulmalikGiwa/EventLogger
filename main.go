@@ -10,6 +10,7 @@ import (
 
 // Event struct where all requests will eventually be written to.
 type Event struct {
+	sync.Mutex           // To avoid race conditions
 	WebsiteUrl         string          `json:"websiteUrl"`
 	SessionId          string          `json:"sessionId"`
 	ResizeFrom         Dimension       `json:"resizeFrom"`
@@ -22,7 +23,6 @@ type Event struct {
 // sync.Mutex is here because the functions that are responsible for writing to the Event struct are receivers
 // on PostBody and will make available the Lock method to help with mutual exclusion on Event.
 type PostBody struct {
-	sync.Mutex           // To avoid race conditions
 	WebsiteUrl string    `json:"websiteUrl"`
 	SessionId  string    `json:"sessionId"`
 	ResizeFrom Dimension `json:"resizeFrom"`
@@ -107,7 +107,6 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		RequestBody.Lock()
 		if RequestBody.EventType == "copyAndPaste" {
 			err = RequestBody.CopyPasteEvent()
 		} else if RequestBody.EventType == "screenResize" {
@@ -115,7 +114,6 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		} else if RequestBody.EventType == "timeTaken" {
 			err = RequestBody.TimeTakenEvent()
 		}
-		RequestBody.Unlock()
 		if err != nil {
 			_, _ = w.Write(WriteResponse(err.Error(), http.StatusBadRequest))
 			return
